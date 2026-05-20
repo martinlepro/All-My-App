@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -451,4 +452,190 @@
 </script>
 
 </body>
+=======
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extracteur de Fichiers ZIP</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .container {
+            max-width: 600px;
+            width: 100%;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        h1 {
+            color: #0076ff;
+            margin-bottom: 20px;
+        }
+        .file-input-wrapper {
+            margin: 20px 0;
+        }
+        input[type="file"] {
+            display: none;
+        }
+        .custom-file-upload {
+            border: 2px dashed #0076ff;
+            display: inline-block;
+            padding: 15px 30px;
+            cursor: pointer;
+            border-radius: 5px;
+            background-color: #f0f7ff;
+            color: #0076ff;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+        .custom-file-upload:hover {
+            background-color: #e0efff;
+        }
+        #status {
+            margin: 15px 0;
+            font-weight: bold;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+            text-align: left;
+            margin-top: 20px;
+        }
+        li {
+            padding: 12px;
+            background: #f9f9f9;
+            border: 1px solid #eee;
+            margin-bottom: 8px;
+            border-radius: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        li.folder {
+            background: #fffdf0;
+            border-left: 4px solid #f39c12;
+            font-weight: bold;
+        }
+        .btn-download {
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 0.9em;
+        }
+        .btn-download:hover {
+            background-color: #27ae60;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Extracteur de ZIP en ligne</h1>
+    <p>Sélectionnez un fichier ZIP pour explorer et télécharger son contenu individuellement.</p>
+    
+    <div class="file-input-wrapper">
+        <label for="zip-file" class="custom-file-upload">
+            Choisir un fichier .zip
+        </label>
+        <input type="file" id="zip-file" accept=".zip">
+    </div>
+
+    <div id="status"></div>
+    <ul id="file-list"></ul>
+</div>
+
+<script>
+    document.getElementById('zip-file').addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        const statusDiv = document.getElementById('status');
+        const fileList = document.getElementById('file-list');
+        
+        // Réinitialisation
+        fileList.innerHTML = '';
+        statusDiv.innerText = '';
+
+        if (!file) return;
+
+        statusDiv.style.color = '#333';
+        statusDiv.innerText = "Lecture du fichier ZIP en cours...";
+
+        const reader = new FileReader();
+        
+        reader.onload = function(evt) {
+            JSZip.loadAsync(evt.target.result)
+            .then(function(zip) {
+                statusDiv.style.color = '#2ecc71';
+                statusDiv.innerText = "Fichier ZIP chargé avec succès ! Voici son contenu :";
+
+                zip.forEach(function (relativePath, zipEntry) {
+                    const li = document.createElement('li');
+                    
+                    if (zipEntry.dir) {
+                        // C'est un dossier
+                        li.className = 'folder';
+                        li.innerText = `📁 ${relativePath}`;
+                        fileList.appendChild(li);
+                    } else {
+                        // C'est un fichier
+                        li.innerText = `📄 ${relativePath}`;
+                        
+                        const downloadBtn = document.createElement('button');
+                        downloadBtn.className = 'btn-download';
+                        downloadBtn.innerText = 'Télécharger';
+                        
+                        // Événement au clic pour extraire et télécharger ce fichier spécifique
+                        downloadBtn.addEventListener('click', function() {
+                            statusDiv.style.color = '#333';
+                            statusDiv.innerText = `Extraction de ${zipEntry.name}...`;
+                            
+                            zipEntry.async('blob').then(function(content) {
+                                const url = window.URL.createObjectURL(content);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                // Récupère uniquement le nom du fichier sans l'arborescence complète pour le téléchargement direct
+                                a.download = zipEntry.name.split('/').pop();
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                window.URL.revokeObjectURL(url);
+                                
+                                statusDiv.style.color = '#2ecc71';
+                                statusDiv.innerText = `Téléchargement de ${zipEntry.name} réussi.`;
+                            });
+                        });
+                        
+                        li.appendChild(downloadBtn);
+                        fileList.appendChild(li);
+                    }
+                });
+            })
+            .catch(function(err) {
+                statusDiv.style.color = '#e74c3c';
+                statusDiv.innerText = "Erreur lors de l'ouverture du fichier ZIP : " + err.message;
+            });
+        };
+
+        reader.readAsArrayBuffer(file);
+    });
+</script>
+
+</body>
+>>>>>>> e7d8d7f242eee1d00feb14b36f260a91498ad79d
 </html>
