@@ -236,13 +236,18 @@
 
 <script>
     // Liste de tes fichiers ZIP sur GitHub
-    const zipFiles = [
+    const zipFilesNames = [
         "livesplit.zip",
         "multi-game.zip",
         "Mytube.zip",
         "pvz multi.zip",
         "steamvault.zip"
     ];
+
+    // Génère les vrais liens de téléchargement pour Git LFS
+    const zipFiles = zipFilesNames.map(name => 
+        `https://media.githubusercontent.com/media/martinlepro/All-My-App/main/${encodeURIComponent(name)}`
+    );
 
     let currentPath = ""; 
     let virtualTree = { files: {}, dirs: {} };
