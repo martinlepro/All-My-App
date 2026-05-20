@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-My-App | Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        .apps-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .app-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: #f0fdf4;
+            color: var(--success);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .app-info h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .app-meta {
+            display: flex;
+            gap: 15px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .app-meta span i {
+            margin-right: 4px;
+        }
+
+        /* Style de l'historique / changelog */
+        .app-history {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #475569;
+            border-left: 3px solid var(--primary);
+        }
+
+        .app-history ul {
+            margin: 5px 0 0 0;
+            padding-left: 20px;
+        }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+
+        .btn-download:hover {
+            background-color: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 640px) {
+            .app-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .app-icon {
+                margin: 0 auto;
+            }
+            .app-meta {
+                justify-content: center;
+            }
+            .btn-download {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>All-My-App</h1>
+    <p>Mon magasin Android privé & Historique des versions</p>
+</header>
+
+<div class="container">
+    <div class="apps-grid" id="apps-container">
+        </div>
+</div>
+
+<script>
+    // Configuration de tes applications et de leur historique
+    // Tu peux modifier les textes, versions et dates ici très facilement !
+    const myApps = [
+        {
+            name: "LiveSplit Mobile",
+            filename: "livesplit.apk",
+            version: "v1.2.0",
+            date: "20 mai 2026",
+            history: [
+                "Optimisation du chronomètre",
+                "Correction d'un bug d'affichage sur les écrans 120Hz"
+            ]
+        },
+        {
+            name: "Multi-Game Hub",
+            filename: "multi-game.apk",
+            version: "v3.0.1",
+            date: "18 mai 2026",
+            history: [
+                "Ajout de 2 nouveaux mini-jeux",
+                "Sauvegarde automatique dans le cloud fonctionnelle"
+            ]
+        },
+        {
+            name: "MyTube Player",
+            filename: "mytube.apk",
+            version: "v2.1.4",
+            date: "10 mai 2026",
+            history: [
+                "Mise à jour de l'API de lecture",
+                "Mode sombre amélioré"
+            ]
+        },
+        {
+            name: "PvZ Multi Plugin",
+            filename: "pvz-multi.apk",
+            version: "v1.0.0",
+            date: "05 mai 2026",
+            history: [
+                "Première version stable du mod multijoueur"
+            ]
+        },
+        {
+            name: "SteamVault",
+            filename: "steamvault.apk",
+            version: "v1.5.0",
+            date: "01 mai 2026",
+            history: [
+                "Chiffrement renforcé de la base de données locale",
+                "Interface plus fluide"
+            ]
+        }
+    ];
+
+    const container = document.getElementById('apps-container');
+
+    myApps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
+
+        // Création de la liste des modifications de l'historique
+        const historyItems = app.history.map(item => `<li>${item}</li>`).join('');
+
+        card.innerHTML = `
+            <div class="app-icon">
+                <i class="fa-brands fa-android"></i>
+            </div>
+            <div class="app-info">
+                <h3>${app.name}</h3>
+                <div class="app-meta">
+                    <span><i class="fa-solid fa-code-version"></i> ${app.version}</span>
+                    <span><i class="fa-solid fa-calendar-days"></i> ${app.date}</span>
+                </div>
+                <div class="app-history">
+                    <strong>Historique des changements :</strong>
+                    <ul>${historyItems}</ul>
+                </div>
+            </div>
+            <div>
+                <a href="./${encodeURIComponent(app.filename)}" class="btn-download" download>
+                    <i class="fa-solid fa-download"></i> Installer l'APK
+                </a>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+</script>
+
+</body>
+</html>
