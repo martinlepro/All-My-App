@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-My-App | Mon Explorateur de Fichiers</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .upload-zone {
+            background: var(--bg-card);
+            border: 2px dashed #cbd5e1;
+            padding: 40px 20px;
+            border-radius: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--primary);
+            background: #f5f3ff;
+        }
+
+        .upload-zone i {
+            font-size: 3rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 25px 0 15px 0;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .breadcrumb span.active {
+            color: var(--primary);
+        }
+
+        .breadcrumb .separator {
+            color: #cbd5e1;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: #cbd5e1;
+            color: var(--text-main);
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-bottom: 15px;
+            transition: background 0.2s;
+        }
+
+        .back-btn:hover {
+            background: #94a3b8;
+        }
+
+        .explorer {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .explorer-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            padding: 15px 24px;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .file-info i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+        }
+
+        .file-info i.fa-folder { color: #f59e0b; }
+        .file-info i.fa-android { color: #a4c639; }
+        .file-info i.fa-file { color: #64748b; }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: var(--primary-hover);
+        }
+
+        #status-bar {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .info-status { background: #e0f2fe; color: #0369a1; }
+        .success-status { background: #dcfce7; color: #15803d; }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>All-My-App</h1>
+    <p>Bibliothèque personnelle & Explorateur d'applications</p>
+</header>
+
+<div class="container">
+    <div class="upload-zone" onclick="document.getElementById('zip-file').click()">
+        <i class="fa-solid fa-cloud-arrow-up"></i>
+        <h3>Cliquez pour parcourir un fichier ZIP</h3>
+        <p style="color: var(--text-muted); margin: 5px 0 0 0;">Exemple : vos dossiers compressés d'applications (APK, etc.)</p>
+        <input type="file" id="zip-file" accept=".zip">
+    </div>
+
+    <div id="status-bar"></div>
+
+    <div id="explorer-section" style="display: none;">
+        <div class="breadcrumb" id="breadcrumb">
+            <span class="active">Racine</span>
+        </div>
+        
+        <button class="back-btn" id="back-btn" style="display: none;">
+            <i class="fa-solid fa-arrow-left"></i> Retour
+        </button>
+
+        <div class="explorer">
+            <div class="explorer-header">
+                <div>Nom</div>
+                <div>Action</div>
+            </div>
+            <ul class="file-list" id="file-list">
+                </ul>
+        </div>
+    </div>
+</div>
+
+<script>
+    let globalZipInstance = null;
+    let currentPath = ""; // Gère la position actuelle dans les dossiers du ZIP
+    let virtualTree = {};
+
+    const zipInput = document.getElementById('zip-file');
+    const statusBar = document.getElementById('status-bar');
+    const explorerSection = document.getElementById('explorer-section');
+    const fileListEl = document.getElementById('file-list');
+    const backBtn = document.getElementById('back-btn');
+    const breadcrumbEl = document.getElementById('breadcrumb');
+
+    zipInput.addEventListener('change', function(e) {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        showStatus("Analyse et construction de l'arborescence...", "info-status");
+
+        const reader = new FileReader();
+        reader.onload = function(evt) {
+            JSZip.loadAsync(evt.target.result)
+            .then(function(zip) {
+                globalZipInstance = zip;
+                currentPath = "";
+                buildVirtualTree(zip);
+                showStatus("Archive chargée ! Exploration disponible ci-dessous.", "success-status");
+                explorerSection.style.display = "block";
+                renderCurrentDirectory();
+            })
+            .catch(function(err) {
+                showStatus("Erreur d'ouverture : " + err.message, "info-status");
+            });
+        };
+        reader.readAsArrayBuffer(file);
+    });
+
+    // Construit une structure de dossier propre à partir de la liste plate du ZIP
+    function buildVirtualTree(zip) {
+        virtualTree = { files: {}, dirs: {} };
+        
+        zip.forEach(function(relativePath, zipEntry) {
+            // Nettoyage des slashs de fin
+            const cleanPath = relativePath.replace(/\/$/, "");
+            if(!cleanPath) return;
+
+            const parts = cleanPath.split('/');
+            let current = virtualTree;
+
+            for (let i = 0; i < parts.length; i++) {
+                const part = parts[i];
+                const isLast = (i === parts.length - 1);
+
+                if (isLast && !zipEntry.dir) {
+                    // C'est un fichier original
+                    current.files[part] = zipEntry;
+                } else {
+                    // C'est un dossier intermédiaire ou déclaré
+                    if (!current.dirs[part]) {
+                        current.dirs[part] = { files: {}, dirs: {} };
+                    }
+                    current = current.dirs[part];
+                }
+            }
+        });
+    }
+
+    // Affiche le contenu du dossier actif actuel
+    function renderCurrentDirectory() {
+        fileListEl.innerHTML = '';
+        
+        // Trouver le noeud actuel dans notre arbre virtuel
+        let parts = currentPath.split('/').filter(p => p !== "");
+        let node = virtualTree;
+        for (let part of parts) {
+            if (node.dirs[part]) node = node.dirs[part];
+        }
+
+        // Gérer le bouton retour
+        if (currentPath !== "") {
+            backBtn.style.display = "inline-flex";
+        } else {
+            backBtn.style.display = "none";
+        }
+
+        updateBreadcrumb(parts);
+
+        // 1. Rendre les dossiers enfants
+        for (let dirName in node.dirs) {
+            const li = document.createElement('li');
+            li.className = 'file-item';
+            
+            li.innerHTML = `
+                <div class="file-info">
+                    <i class="fa-solid fa-folder"></i>
+                    <span class="file-name">${dirName}</span>
+                </div>
+                <div></div>
+            `;
+            
+            // Clic sur le dossier pour y entrer
+            li.querySelector('.file-info').addEventListener('click', () => {
+                currentPath = currentPath ? `${currentPath}/${dirName}` : dirName;
+                renderCurrentDirectory();
+            });
+            
+            fileListEl.appendChild(li);
+        }
+
+        // 2. Rendre les fichiers enfants
+        for (let fileName in node.files) {
+            const zipEntry = node.files[fileName];
+            const li = document.createElement('li');
+            li.className = 'file-item';
+
+            // Choix de l'icône selon l'extension (.apk ou autre)
+            let iconClass = "fa-solid fa-file";
+            if (fileName.toLowerCase().endsWith('.apk')) {
+                iconClass = "fa-brands fa-android";
+            }
+
+            li.innerHTML = `
+                <div class="file-info">
+                    <i class="${iconClass}"></i>
+                    <span class="file-name">${fileName}</span>
+                </div>
+                <div>
+                    <button class="btn-download"><i class="fa-solid fa-download"></i> Télécharger</button>
+                </div>
+            `;
+
+            // Événement de téléchargement au clic sur le bouton
+            li.querySelector('.btn-download').addEventListener('click', () => {
+                showStatus(`Extraction et préparation de ${fileName}...`, "info-status");
+                
+                zipEntry.async('blob').then(function(content) {
+                    const url = window.URL.createObjectURL(content);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = fileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);
+                    showStatus(`${fileName} téléchargé avec succès !`, "success-status");
+                });
+            });
+
+            fileListEl.appendChild(li);
+        }
+
+        if (fileListEl.children.length === 0) {
+            fileListEl.innerHTML = `<li class="file-item" style="color: var(--text-muted);">Dossier vide</li>`;
+        }
+    }
+
+    // Bouton Retour
+    backBtn.addEventListener('click', () => {
+        let parts = currentPath.split('/').filter(p => p !== "");
+        parts.pop(); // Retire le dernier dossier
+        currentPath = parts.join('/');
+        renderCurrentDirectory();
+    });
+
+    function updateBreadcrumb(parts) {
+        breadcrumbEl.innerHTML = '<span style="cursor:pointer" id="crumb-root">Racine</span>';
+        document.getElementById('crumb-root').addEventListener('click', () => {
+            currentPath = "";
+            renderCurrentDirectory();
+        });
+
+        let pathAccumulator = "";
+        parts.forEach((part, index) => {
+            pathAccumulator = pathAccumulator ? `${pathAccumulator}/${part}` : part;
+            const currentSnap = pathAccumulator;
+
+            const sep = document.createElement('span');
+            sep.className = 'separator';
+            sep.innerText = ' / ';
+            breadcrumbEl.appendChild(sep);
+
+            const span = document.createElement('span');
+            if (index === parts.length - 1) {
+                span.className = 'active';
+                span.innerText = part;
+            } else {
+                span.innerText = part;
+                span.style.cursor = "pointer";
+                span.addEventListener('click', () => {
+                    currentPath = currentSnap;
+                    renderCurrentDirectory();
+                });
+            }
+            breadcrumbEl.appendChild(span);
+        });
+    }
+
+    function showStatus(text, className) {
+        statusBar.className = className;
+        statusBar.innerText = text;
+        statusBar.style.display = "block";
+    }
+</script>
+
+</body>
+</html>
