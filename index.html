@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-My-App | Ma Bibliothèque d'Applications</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
+            color: white;
+            padding: 40px 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: -0.05em;
+        }
+
+        header p {
+            margin: 10px 0 0 0;
+            opacity: 0.8;
+            font-size: 1.1rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .explorer {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
+        }
+
+        .explorer-header {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            padding: 15px 24px;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+
+        .file-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .file-item {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
+        }
+
+        .file-item:last-child {
+            border-bottom: none;
+        }
+
+        .file-item:hover {
+            background-color: #f8fafc;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            user-select: none;
+        }
+
+        .file-info i {
+            font-size: 1.3rem;
+            width: 24px;
+            text-align: center;
+            color: #f59e0b; /* Couleur dossier/archive */
+        }
+
+        .file-name {
+            font-weight: 500;
+            color: var(--text-main);
+        }
+
+        .btn-download {
+            background-color: var(--primary);
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>All-My-App</h1>
+    <p>Magasin d'applications personnel & Téléchargements</p>
+</header>
+
+<div class="container">
+    <div class="explorer">
+        <div class="explorer-header">
+            <div>Application (Archive ZIP)</div>
+            <div>Action</div>
+        </div>
+        <ul class="file-list" id="file-list">
+            </ul>
+    </div>
+</div>
+
+<script>
+    // Liste simplifiée de tes applications stockées sur ton dépôt GitHub
+    const apps = [
+        "livesplit.zip",
+        "multi-game.zip",
+        "Mytube.zip",
+        "pvz multi.zip",
+        "steamvault.zip"
+    ];
+
+    const fileListEl = document.getElementById('file-list');
+
+    // Génération automatique de la liste sur la page web
+    apps.forEach(appName => {
+        const li = document.createElement('li');
+        li.className = 'file-item';
+
+        // Lien direct de téléchargement pointant vers la racine de ton dépôt GitHub Pages
+        const downloadUrl = `./${encodeURIComponent(appName)}`;
+
+        li.innerHTML = `
+            <div class="file-info">
+                <i class="fa-solid fa-file-zipper"></i>
+                <span class="file-name">${appName}</span>
+            </div>
+            <div>
+                <a href="${downloadUrl}" class="btn-download" download>
+                    <i class="fa-solid fa-download"></i> Télécharger
+                </a>
+            </div>
+        `;
+        fileListEl.appendChild(li);
+    });
+</script>
+
+</body>
+</html>
