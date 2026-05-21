@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-My-App | Ma Bibliothèque d'Applications</title>
+    <title>All-My-App | Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -14,6 +14,7 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
+            --success: #10b981;
         }
 
         body {
@@ -46,87 +47,147 @@
         }
 
         .container {
-            max-width: 1000px;
-            margin: 30px auto;
+            max-width: 900px;
+            margin: 40px auto;
             padding: 0 20px;
         }
 
-        .explorer {
+        .apps-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .app-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            overflow: hidden;
-            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05);
-        }
-
-        .explorer-header {
+            padding: 24px;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
             display: grid;
-            grid-template-columns: 1fr auto;
-            padding: 15px 24px;
-            background: #f1f5f9;
-            border-bottom: 1px solid var(--border);
-            font-weight: 600;
-            color: var(--text-muted);
-            font-size: 0.9rem;
+            grid-template-columns: auto 1fr auto;
+            align-items: start;
+            gap: 20px;
         }
 
-        .file-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-
-        .file-item {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            padding: 14px 24px;
-            border-bottom: 1px solid var(--border);
-            transition: background 0.2s;
-        }
-
-        .file-item:last-child {
-            border-bottom: none;
-        }
-
-        .file-item:hover {
-            background-color: #f8fafc;
-        }
-
-        .file-info {
+        .app-icon {
+            width: 60px;
+            height: 60px;
+            background: #f0fdf4;
+            color: var(--success);
+            border-radius: 12px;
             display: flex;
             align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+        }
+
+        .app-info h3 {
+            margin: 0 0 6px 0;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .app-meta {
+            display: flex;
             gap: 15px;
-            user-select: none;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 12px;
         }
 
-        .file-info i {
-            font-size: 1.3rem;
-            width: 24px;
-            text-align: center;
-            color: #f59e0b; /* Couleur dossier/archive */
+        .app-meta span i {
+            margin-right: 4px;
         }
 
-        .file-name {
-            font-weight: 500;
-            color: var(--text-main);
+        /* Section historique / changelog */
+        .app-history {
+            background: #f8fafc;
+            border-radius: 10px;
+            padding: 14px;
+            font-size: 0.85rem;
+            color: #334155;
+            border-left: 4px solid var(--primary);
+        }
+
+        .app-history .history-title {
+            font-weight: 700;
+            margin-bottom: 8px;
+            display: block;
+            color: #1e293b;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+        }
+
+        .app-history ul {
+            margin: 0;
+            padding-left: 0;
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .app-history li {
+            position: relative;
+            padding-left: 15px;
+        }
+
+        .app-history li::before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        .version-tag {
+            font-weight: 600;
+            color: var(--primary);
         }
 
         .btn-download {
             background-color: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 8px 16px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             font-weight: 600;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            transition: background 0.2s;
+            transition: all 0.2s;
+            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
+            align-self: center;
         }
 
         .btn-download:hover {
             background-color: var(--primary-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
+        }
+
+        @media (max-width: 640px) {
+            .app-card {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            .app-icon {
+                margin: 0 auto;
+            }
+            .app-meta {
+                justify-content: center;
+            }
+            .app-history {
+                text-align: left;
+            }
+            .btn-download {
+                justify-content: center;
+                width: 100%;
+                box-sizing: border-box;
+            }
         }
     </style>
 </head>
@@ -134,52 +195,94 @@
 
 <header>
     <h1>All-My-App</h1>
-    <p>Magasin d'applications personnel & Téléchargements</p>
+    <p>Mon magasin Android privé & Suivi complet des versions</p>
 </header>
 
 <div class="container">
-    <div class="explorer">
-        <div class="explorer-header">
-            <div>Application (Archive ZIP)</div>
-            <div>Action</div>
+    <div class="apps-grid" id="apps-container">
         </div>
-        <ul class="file-list" id="file-list">
-            </ul>
-    </div>
 </div>
 
 <script>
-    // Liste simplifiée de tes applications stockées sur ton dépôt GitHub
-    const apps = [
-        "livesplit.zip",
-        "multi-game.zip",
-        "Mytube.zip",
-        "pvz multi.zip",
-        "steamvault.zip"
+    // Configuration des applications et de tout l'historique demandé
+    const myApps = [
+        {
+            name: "GameApp",
+            filename: "gameapp.apk",
+            latestVersion: "v9",
+            icon: "fa-gamepad",
+            history: [
+                "<span class='version-tag'>v9 :</span> Correction de bugs.",
+                "<span class='version-tag'>v8 :</span> Amélioration de l'interface, des fonctionnalités et ajout d'un tutoriel au début.",
+                "<span class='version-tag'>v7 :</span> Ajout d'un menu en haut et passage à 302 jeux.",
+                "<span class='version-tag'>v6 :</span> 20 jeux en plus.",
+                "<span class='version-tag'>v5 :</span> 20 jeux en plus.",
+                "<span class='version-tag'>v4 :</span> 20 jeux en plus.",
+                "<span class='version-tag'>v3 :</span> Passage à 22 catégories et 163 jeux jouables.",
+                "<span class='version-tag'>v2 :</span> 20 jeux en plus.",
+                "<span class='version-tag'>v1 :</span> Lancement officiel avec 84 jeux jouables et 20 catégories."
+            ]
+        },
+        {
+            name: "SteamVault",
+            filename: "steamvault.apk",
+            latestVersion: "v6",
+            icon: "fa-vault",
+            history: [
+                "<span class='version-tag'>v6 :</span> Correction de bugs.",
+                "<span class='version-tag'>v5 :</span> Correction de bugs.",
+                "<span class='version-tag'>v4 :</span> Correction de bugs.",
+                "<span class='version-tag'>v3 :</span> Correction de bugs.",
+                "<span class='version-tag'>v2 :</span> Correction de bugs.",
+                "<span class='version-tag'>v1 :</span> Première version stable de l'application."
+            ]
+        },
+        {
+            name: "MyTube Player",
+            filename: "mytube.apk",
+            latestVersion: "v6",
+            icon: "fa-video",
+            history: [
+                "<span class='version-tag'>v6 :</span> Correction de bugs.",
+                "<span class='version-tag'>v5 :</span> Correction de bugs.",
+                "<span class='version-tag'>v4 :</span> Correction de bugs.",
+                "<span class='version-tag'>v3 :</span> Correction de bugs.",
+                "<span class='version-tag'>v2 :</span> Correction de bugs.",
+                "<span class='version-tag'>v1 :</span> Première version stable de l'application."
+            ]
+        }
     ];
 
-    const fileListEl = document.getElementById('file-list');
+    const container = document.getElementById('apps-container');
 
-    // Génération automatique de la liste sur la page web
-    apps.forEach(appName => {
-        const li = document.createElement('li');
-        li.className = 'file-item';
+    myApps.forEach(app => {
+        const card = document.createElement('div');
+        card.className = 'app-card';
 
-        // Lien direct de téléchargement pointant vers la racine de ton dépôt GitHub Pages
-        const downloadUrl = `./${encodeURIComponent(appName)}`;
+        const historyItems = app.history.map(item => `<li>${item}</li>`).join('');
 
-        li.innerHTML = `
-            <div class="file-info">
-                <i class="fa-solid fa-file-zipper"></i>
-                <span class="file-name">${appName}</span>
+        card.innerHTML = `
+            <div class="app-icon">
+                <i class="fa-solid ${app.icon}"></i>
+            </div>
+            <div class="app-info">
+                <h3>${app.name}</h3>
+                <div class="app-meta">
+                    <span><i class="fa-solid fa-code-version"></i> Version actuelle : ${app.latestVersion}</span>
+                    <span><i class="fa-brands fa-android"></i> Format APK</span>
+                </div>
+                <div class="app-history">
+                    <span class="history-title"><i class="fa-solid fa-clock-rotate-left"></i> Historique des changements</span>
+                    <ul>${historyItems}</ul>
+                </div>
             </div>
             <div>
-                <a href="${downloadUrl}" class="btn-download" download>
-                    <i class="fa-solid fa-download"></i> Télécharger
+                <a href="./${encodeURIComponent(app.filename)}" class="btn-download" download>
+                    <i class="fa-solid fa-download"></i> Installer l'APK
                 </a>
             </div>
         `;
-        fileListEl.appendChild(li);
+        container.appendChild(card);
     });
 </script>
 
