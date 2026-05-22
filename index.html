@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>All-My-App | Dashboard</title>
+    <title>All-My-App | Explorateur de Versions</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -14,7 +14,7 @@
             --text-main: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --success: #10b981;
+            --folder-color: #f59e0b;
         }
 
         body {
@@ -28,262 +28,298 @@
         header {
             background: linear-gradient(135deg, #1e1b4b 0%, #312e81 100%);
             color: white;
-            padding: 40px 20px;
+            padding: 30px 20px;
             text-align: center;
             box-shadow: 0 4px 20px rgba(0,0,0,0.08);
         }
 
-        header h1 {
-            margin: 0;
-            font-size: 2.5rem;
-            font-weight: 700;
-            letter-spacing: -0.05em;
-        }
-
-        header p {
-            margin: 10px 0 0 0;
-            opacity: 0.8;
-            font-size: 1.1rem;
-        }
+        header h1 { margin: 0; font-size: 2.2rem; font-weight: 700; }
+        header p { margin: 5px 0 0 0; opacity: 0.8; font-size: 1rem; }
 
         .container {
             max-width: 900px;
-            margin: 40px auto;
+            margin: 30px auto;
             padding: 0 20px;
         }
 
-        .apps-grid {
+        /* Fil d'Ariane (Navigation) */
+        .breadcrumb {
             display: flex;
-            flex-direction: column;
-            gap: 25px;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: var(--bg-card);
+            padding: 12px 20px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
         }
 
-        .app-card {
+        .breadcrumb span { color: var(--text-muted); }
+        .breadcrumb a {
+            color: var(--primary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .breadcrumb a:hover { text-decoration: underline; }
+
+        /* Grille des dossiers et fichiers */
+        .explorer-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 24px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .list-item {
             display: grid;
             grid-template-columns: auto 1fr auto;
-            align-items: start;
-            gap: 20px;
+            align-items: center;
+            padding: 16px 24px;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.2s;
         }
 
-        .app-icon {
-            width: 60px;
-            height: 60px;
-            background: #f0fdf4;
-            color: var(--success);
-            border-radius: 12px;
+        .list-item:last-child { border-bottom: none; }
+        .list-item.clickable { cursor: pointer; }
+        .list-item.clickable:hover { background-color: #f1f5f9; }
+
+        .item-icon {
+            font-size: 1.5rem;
+            width: 35px;
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 2rem;
         }
+        .icon-folder { color: var(--folder-color); }
+        .icon-apk { color: #10b981; }
+        .icon-txt { color: #38bdf8; }
 
-        .app-info h3 {
-            margin: 0 0 6px 0;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: #1e293b;
-        }
+        .item-details h3 { margin: 0; font-size: 1.1rem; font-weight: 600; color: #1e293b; }
+        .item-details p { margin: 3px 0 0 0; font-size: 0.85rem; color: var(--text-muted); }
 
-        .app-meta {
-            display: flex;
-            gap: 15px;
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 12px;
-        }
-
-        .app-meta span i {
-            margin-right: 4px;
-        }
-
-        /* Section historique / changelog */
-        .app-history {
-            background: #f8fafc;
-            border-radius: 10px;
-            padding: 14px;
-            font-size: 0.85rem;
-            color: #334155;
-            border-left: 4px solid var(--primary);
-        }
-
-        .app-history .history-title {
-            font-weight: 700;
-            margin-bottom: 8px;
-            display: block;
-            color: #1e293b;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 0.05em;
-        }
-
-        .app-history ul {
-            margin: 0;
-            padding-left: 0;
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-        }
-
-        .app-history li {
-            position: relative;
-            padding-left: 15px;
-        }
-
-        .app-history li::before {
-            content: "•";
-            color: var(--primary);
-            font-weight: bold;
-            position: absolute;
-            left: 0;
-        }
-
-        .version-tag {
-            font-weight: 600;
-            color: var(--primary);
-        }
-
-        .btn-download {
+        .btn-action {
             background-color: var(--primary);
             color: white;
             text-decoration: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.85rem;
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-            box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2);
-            align-self: center;
+            gap: 6px;
+            transition: background 0.2s;
         }
+        .btn-action:hover { background-color: var(--primary-hover); }
 
-        .btn-download:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3);
-        }
-
-        @media (max-width: 640px) {
-            .app-card {
-                grid-template-columns: 1fr;
-                text-align: center;
-            }
-            .app-icon {
-                margin: 0 auto;
-            }
-            .app-meta {
-                justify-content: center;
-            }
-            .app-history {
-                text-align: left;
-            }
-            .btn-download {
-                justify-content: center;
-                width: 100%;
-                box-sizing: border-box;
-            }
+        /* Zone d'affichage du texte du patch notes */
+        .patch-text-box {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: #334155;
+            margin-top: 5px;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1>All-My-App</h1>
-    <p>Mon magasin Android privé & Suivi complet des versions</p>
+    <h1 id="txt-title">All-My-App Explorer</h1>
+    <p id="txt-subtitle"><i class="fa-solid fa-folder-tree"></i> Navigue dans les dossiers de mes applications et de leurs versions</p>
 </header>
 
 <div class="container">
-    <div class="apps-grid" id="apps-container">
-        </div>
+    <div class="breadcrumb" id="breadcrumb"></div>
+
+    <div class="explorer-card" id="explorer-content"></div>
 </div>
 
 <script>
-    // Configuration des applications et de tout l'historique demandé
-    const myApps = [
-        {
-            name: "GameApp",
-            filename: "gameapp.apk",
-            latestVersion: "v9",
-            icon: "fa-gamepad",
-            history: [
-                "<span class='version-tag'>v9 :</span> Correction de bugs.",
-                "<span class='version-tag'>v8 :</span> Amélioration de l'interface, des fonctionnalités et ajout d'un tutoriel au début.",
-                "<span class='version-tag'>v7 :</span> Ajout d'un menu en haut et passage à 302 jeux.",
-                "<span class='version-tag'>v6 :</span> 20 jeux en plus.",
-                "<span class='version-tag'>v5 :</span> 20 jeux en plus.",
-                "<span class='version-tag'>v4 :</span> 20 jeux en plus.",
-                "<span class='version-tag'>v3 :</span> Passage à 22 catégories et 163 jeux jouables.",
-                "<span class='version-tag'>v2 :</span> 20 jeux en plus.",
-                "<span class='version-tag'>v1 :</span> Lancement officiel avec 84 jeux jouables et 20 catégories."
-            ]
+    // --- DICTIONNAIRE DE TRADUCTION ---
+    const translations = {
+        fr: {
+            title: "All-My-App Explorer",
+            subtitle: "Navigue dans les dossiers de mes applications et de leurs versions",
+            root: "Racine",
+            folderApp: "Dossier d'application",
+            folderVer: "Dossier de version",
+            apkDesc: "Fichier d'application Android prêt à installer",
+            installBtn: "Installer l'APK",
+            versionWord: "Version"
         },
-        {
-            name: "SteamVault",
-            filename: "steamvault.apk",
-            latestVersion: "v6",
-            icon: "fa-vault",
-            history: [
-                "<span class='version-tag'>v6 :</span> Correction de bugs.",
-                "<span class='version-tag'>v5 :</span> Correction de bugs.",
-                "<span class='version-tag'>v4 :</span> Correction de bugs.",
-                "<span class='version-tag'>v3 :</span> Correction de bugs.",
-                "<span class='version-tag'>v2 :</span> Correction de bugs.",
-                "<span class='version-tag'>v1 :</span> Première version stable de l'application."
-            ]
-        },
-        {
-            name: "MyTube Player",
-            filename: "mytube.apk",
-            latestVersion: "v6",
-            icon: "fa-video",
-            history: [
-                "<span class='version-tag'>v6 :</span> Correction de bugs.",
-                "<span class='version-tag'>v5 :</span> Correction de bugs.",
-                "<span class='version-tag'>v4 :</span> Correction de bugs.",
-                "<span class='version-tag'>v3 :</span> Correction de bugs.",
-                "<span class='version-tag'>v2 :</span> Correction de bugs.",
-                "<span class='version-tag'>v1 :</span> Première version stable de l'application."
-            ]
+        en: {
+            title: "All-My-App Explorer",
+            subtitle: "Browse through my applications and their version folders",
+            root: "Root",
+            folderApp: "Application folder",
+            folderVer: "Version folder",
+            apkDesc: "Android application file ready to install",
+            installBtn: "Install APK",
+            versionWord: "Version"
         }
-    ];
+    };
 
-    const container = document.getElementById('apps-container');
+    // Détection de la langue (par défaut 'fr' si la langue du navigateur commence par 'fr', sinon 'en')
+    const userLang = navigator.language.startsWith('fr') ? 'fr' : 'en';
+    const lang = translations[userLang];
 
-    myApps.forEach(app => {
-        const card = document.createElement('div');
-        card.className = 'app-card';
+    // Application des textes statiques traduits
+    document.getElementById('txt-title').innerText = lang.title;
+    document.getElementById('txt-subtitle').innerHTML = `<i class="fa-solid fa-folder-tree"></i> ${lang.subtitle}`;
 
-        const historyItems = app.history.map(item => `<li>${item}</li>`).join('');
+    // --- BASE DE DONNÉES DE L'EXPLORATEUR (FUSIONNÉE ET EN DEUX LANGUES) ---
+    const repoData = {
+        name: { fr: lang.root, en: lang.root },
+        type: "root",
+        children: {
+            "gameapp": {
+                name: { fr: "GameApp", en: "GameApp" },
+                type: "app",
+                children: {
+                    "v9": { name: `${lang.versionWord} 9`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "gameapp-v9.apk" },
+                    "v8": { name: `${lang.versionWord} 8`, type: "version", patch: { fr: "Amélioration de l'interface, des fonctionnalités et ajout d'un tutoriel au début.", en: "UI improvements, features update, and tutorial added at startup." }, apk: "gameapp-v8.apk" },
+                    "v7": { name: `${lang.versionWord} 7`, type: "version", patch: { fr: "Ajout d'un menu en haut et passage à 302 jeux.", en: "Added top menu and expanded to 302 playable games." }, apk: "gameapp-v7.apk" },
+                    "v6": { name: `${lang.versionWord} 6`, type: "version", patch: { fr: "20 jeux en plus.", en: "20 additional games." }, apk: "gameapp-v6.apk" },
+                    "v5": { name: `${lang.versionWord} 5`, type: "version", patch: { fr: "20 jeux en plus.", en: "20 additional games." }, apk: "gameapp-v5.apk" },
+                    "v4": { name: `${lang.versionWord} 4`, type: "version", patch: { fr: "20 jeux en plus.", en: "20 additional games." }, apk: "gameapp-v4.apk" },
+                    "v3": { name: `${lang.versionWord} 3`, type: "version", patch: { fr: "Passage à 22 catégories et 163 jeux jouables.", en: "Upgraded to 22 categories and 163 playable games." }, apk: "gameapp-v3.apk" },
+                    "v2": { name: `${lang.versionWord} 2`, type: "version", patch: { fr: "20 jeux en plus.", en: "20 additional games." }, apk: "gameapp-v2.apk" },
+                    "v1": { name: `${lang.versionWord} 1`, type: "version", patch: { fr: "Lancement officiel avec 84 jeux jouables et 20 catégories.", en: "Official launch with 84 playable games and 20 categories." }, apk: "gameapp-v1.apk" }
+                }
+            },
+            "steamvault-mytube": {
+                name: { fr: "SteamVault & MyTube", en: "SteamVault & MyTube" },
+                type: "app",
+                children: {
+                    "v6": { name: `${lang.versionWord} 6`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "steamvault-mytube-v6.apk" },
+                    "v5": { name: `${lang.versionWord} 5`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "steamvault-mytube-v5.apk" },
+                    "v4": { name: `${lang.versionWord} 4`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "steamvault-mytube-v4.apk" },
+                    "v3": { name: `${lang.versionWord} 3`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "steamvault-mytube-v3.apk" },
+                    "v2": { name: `${lang.versionWord} 2`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "steamvault-mytube-v2.apk" },
+                    "v1": { name: `${lang.versionWord} 1`, type: "version", patch: { fr: "Première version stable de l'application combinée.", en: "First stable release of the combined app." }, apk: "steamvault-mytube-v1.apk" }
+                }
+            },
+            "pvz-multi": {
+                name: { fr: "PvZ Multi Plugin", en: "PvZ Multi Plugin" },
+                type: "app",
+                children: {
+                    "v6": { name: `${lang.versionWord} 6`, type: "version", patch: { fr: "PNG de plantes presque pareil.", en: "Plant PNGs are almost identical." }, apk: "pvz-v6.apk" },
+                    "v5": { name: `${lang.versionWord} 5`, type: "version", patch: { fr: "Essai de PNG pour remplacer les GIF et écran de sélection des plantes.", en: "Testing PNGs instead of GIFs and added plant selection screen." }, apk: "pvz-v5.apk" },
+                    "v4": { name: `${lang.versionWord} 4`, type: "version", patch: { fr: "Amélioration de l'interface et on peut choisir le niveau (jour, nuit, etc.).", en: "UI improvements and level stage selection added (day, night, etc.)." }, apk: "pvz-v4.apk" },
+                    "v3": { name: `${lang.versionWord} 3`, type: "version", patch: { fr: "Amélioration de l'interface et ajout de GIF pour plusieurs plantes.", en: "UI improvements and added GIFs for several plants." }, apk: "pvz-v3.apk" },
+                    "v2": { name: `${lang.versionWord} 2`, type: "version", patch: { fr: "Amélioration de l'interface in-game.", en: "In-game UI improvements." }, apk: "pvz-v2.apk" },
+                    "v1": { name: `${lang.versionWord} 1`, type: "version", patch: { fr: "Interface émoji.", en: "Emoji style interface." }, apk: "pvz-v1.apk" }
+                }
+            },
+            "livesplit": {
+                name: { fr: "LiveSplit Mobile", en: "LiveSplit Mobile" },
+                type: "app",
+                children: {
+                    "v4": { name: `${lang.versionWord} 4`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "livesplit-v4.apk" },
+                    "v3": { name: `${lang.versionWord} 3`, type: "version", patch: { fr: "Correction de bugs.", en: "Bug fixes." }, apk: "livesplit-v3.apk" },
+                    "v2": { name: `${lang.versionWord} 2`, type: "version", patch: { fr: "Refonte complète de l'interface.", en: "Complete user interface redesign." }, apk: "livesplit-v2.apk" },
+                    "v1": { name: `${lang.versionWord} 1`, type: "version", patch: { fr: "Chronomètre en pop-up, bouton pour arrêter et 3 autres fonctions.", en: "Pop-up timer, stop button and 3 other features." }, apk: "livesplit-v1.apk" }
+                }
+            }
+        }
+    };
 
-        card.innerHTML = `
-            <div class="app-icon">
-                <i class="fa-solid ${app.icon}"></i>
-            </div>
-            <div class="app-info">
-                <h3>${app.name}</h3>
-                <div class="app-meta">
-                    <span><i class="fa-solid fa-code-version"></i> Version actuelle : ${app.latestVersion}</span>
-                    <span><i class="fa-brands fa-android"></i> Format APK</span>
+    let currentPath = []; 
+
+    function getFolderByPath(pathArray) {
+        let current = repoData;
+        for (let segment of pathArray) {
+            if (current.children && current.children[segment]) {
+                current = current.children[segment];
+            }
+        }
+        return current;
+    }
+
+    function renderExplorer() {
+        const explorerContent = document.getElementById('explorer-content');
+        const breadcrumb = document.getElementById('breadcrumb');
+        const currentFolder = getFolderByPath(currentPath);
+
+        // 1. Rendu du Fil d'Ariane
+        let breadcrumbHTML = `<a href="#" onclick="navigateTo([])"><i class="fa-solid fa-house"></i> ${lang.root}</a>`;
+        let tempPath = [];
+        for (let i = 0; i < currentPath.length; i++) {
+            tempPath.push(currentPath[i]);
+            let folderObj = getFolderByPath(tempPath);
+            breadcrumbHTML += ` <span>/</span> <a href="#" onclick="navigateTo([${tempPath.map(p => `'${p}'`).join(',')}])">${folderObj.name[userLang]}</a>`;
+        }
+        breadcrumb.innerHTML = breadcrumbHTML;
+
+        // 2. Rendu du contenu
+        explorerContent.innerHTML = "";
+
+        if (currentFolder.type === "root" || currentFolder.type === "app") {
+            for (let key in currentFolder.children) {
+                const child = currentFolder.children[key];
+                const item = document.createElement('div');
+                item.className = "list-item clickable";
+                item.onclick = () => {
+                    currentPath.push(key);
+                    renderExplorer();
+                };
+
+                item.innerHTML = `
+                    <div class="item-icon icon-folder"><i class="fa-solid fa-folder"></i></div>
+                    <div class="item-details">
+                        <h3>${child.name[userLang] || child.name}</h3>
+                        <p>${child.type === 'app' ? lang.folderApp : lang.folderVer}</p>
+                    </div>
+                    <div><i class="fa-solid fa-chevron-right" style="color:#cbd5e1"></i></div>
+                `;
+                explorerContent.appendChild(item);
+            }
+        } else if (currentFolder.type === "version") {
+            // Ligne du patch notes textuel traduit
+            const patchItem = document.createElement('div');
+            patchItem.className = "list-item";
+            patchItem.innerHTML = `
+                <div class="item-icon icon-txt"><i class="fa-solid fa-file-lines"></i></div>
+                <div class="item-details" style="grid-column: span 2;">
+                    <h3>patch_notes.txt</h3>
+                    <div class="patch-text-box">${currentFolder.patch[userLang]}</div>
                 </div>
-                <div class="app-history">
-                    <span class="history-title"><i class="fa-solid fa-clock-rotate-left"></i> Historique des changements</span>
-                    <ul>${historyItems}</ul>
+            `;
+            explorerContent.appendChild(patchItem);
+
+            // Ligne de l'APK à installer avec bouton traduit
+            const apkItem = document.createElement('div');
+            apkItem.className = "list-item";
+            apkItem.innerHTML = `
+                <div class="item-icon icon-apk"><i class="fa-solid fa-robot"></i></div>
+                <div class="item-details">
+                    <h3>${currentFolder.apk}</h3>
+                    <p>${lang.apkDesc}</p>
                 </div>
-            </div>
-            <div>
-                <a href="./${encodeURIComponent(app.filename)}" class="btn-download" download>
-                    <i class="fa-solid fa-download"></i> Installer l'APK
-                </a>
-            </div>
-        `;
-        container.appendChild(card);
-    });
+                <div>
+                    <a href="./${encodeURIComponent(currentFolder.apk)}" class="btn-action" download>
+                        <i class="fa-solid fa-download"></i> ${lang.installBtn}
+                    </a>
+                </div>
+            `;
+            explorerContent.appendChild(apkItem);
+        }
+    }
+
+    window.navigateTo = function(pathArray) {
+        currentPath = pathArray;
+        renderExplorer();
+    };
+
+    renderExplorer();
 </script>
 
 </body>
